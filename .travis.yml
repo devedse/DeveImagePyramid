@@ -8,4 +8,3 @@ deploy:
   file: "/home/travis/build/devedse/DeveImagePyramid/Devedse.DeveImagePyramid/bin/Release/Devedse.DeveImagePyramid.exe"
   on:
     repo: devedse/DeveImagePyramid
-	
