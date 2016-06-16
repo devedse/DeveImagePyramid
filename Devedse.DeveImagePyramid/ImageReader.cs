@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ImagePyramidGenerator
+namespace Devedse.DeveImagePyramid
 {
     public static class ImageReader
     {

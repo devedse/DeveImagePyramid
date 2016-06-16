@@ -7,8 +7,8 @@
     <ProjectGuid>{C1EFBE0F-CBBF-402B-9CC5-835370ACE7F5}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ImagePyramidGenerator</RootNamespace>
-    <AssemblyName>ImagePyramidGenerator</AssemblyName>
+    <RootNamespace>Devedse.DeveImagePyramid</RootNamespace>
+    <AssemblyName>Devedse.DeveImagePyramid</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
