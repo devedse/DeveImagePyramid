@@ -5,6 +5,6 @@ deploy:
   api_key:
     secure: LJ1kLCSQGJcM69bKWSRSoUtoP/pYaeC+i9xsCqNJsVlHTcm3yvIAv4gZLhVikTomB4uxY9ZvRf/YqkmIubfuJRFEQaPuRk2CvbclYldgps2iXQZlqqI5bU4MT3VI/7fXyOhQn2fAezfFgjJZtu82CFtw/sSUhvQ8NrdzHMBkzO2WdWyKjAfFRbkumtkoy+bqL7jRqhnSc3RC7H6nnwoSqdvoRVnxIqRYGeC6C7nVFdo10/N4E10+fOrp6JvtocUTOpb+/dWTxWV4pK1wGj9TWerbScPQaz1opKHc4fiobdYjV6SDPwHc/PvFz4NH/GTo6YsVz5JwZyiMhcDlHUyC3z2HJ2ehanwQgxq7dcUMaYKHExMoOs5EEW0HIo5vCE2yrZMXH8kLDHrYRl2TkvRRDfRKQOdSS6EC/ed+jp/Nyll0QRiEX/xzFMKgcEAhGfvs/rwLumipEvyqu2abdI0RawNICojugIUbAKuAn/gxP62p/MNbixytmj++TNiZEcU7rK1dL9F0bmM9HUKWAnJrpnWMZvxGK9Mfal4WFS4t9PIcmvsh7EtNbMwXu8899p/9ckVYeDTE5PnM0HDKmZ5ndI9/oKGcDKEF+j3YtPwsTm6IkPUJ76EHCKq+qjMtq/Wrq+RmvoWyhEa1D3M4GWJY9YO5zHPbkdqJs0mtWGcUTbY=
   skip_cleanup: true
-  file: "/bin/Release/Devedse.DeveImagePyramid.exe"
+  file: "bin/Release/Devedse.DeveImagePyramid.exe"
   on:
     repo: devedse/DeveImagePyramid
