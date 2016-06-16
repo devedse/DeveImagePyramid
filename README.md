@@ -1,5 +1,7 @@
 # DeveImagePyramid
 
+[![Build Status](https://travis-ci.org/devedse/DeveImagePyramid.svg?branch=master)](https://travis-ci.org/devedse/DeveImagePyramid)
+
 This tool can be used to generate an Image Pyramid. This can then be viewed using for example:
 http://openseadragon.github.io/
 
