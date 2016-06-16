@@ -12,6 +12,7 @@ namespace Devedse.DeveImagePyramid
     {
         static void Main(string[] args)
         {
+            // BLAH BLAH TEST
             var testImagePath = @"0_0.png";
 
             var w = Stopwatch.StartNew();
