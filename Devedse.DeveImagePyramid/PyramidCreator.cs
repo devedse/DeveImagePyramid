@@ -51,8 +51,7 @@ namespace Devedse.DeveImagePyramid
             int filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
             int filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
 
-            //Parallel.For(0, expectedFilesInOutput, i =>
-            for (int i = 0; i < expectedFilesInOutput; i++)
+            Parallel.For(0, expectedFilesInOutput, i =>
             {
                 int xStart = (i % filesInHeight) * 2;
                 int yStart = (i / filesInHeight) * 2;
@@ -78,9 +77,9 @@ namespace Devedse.DeveImagePyramid
                 var outputFileName = $"{xStart / 2}_{yStart / 2}{desiredExtension}";
                 var outputTotalPath = Path.Combine(outputFolder, outputFileName);
 
-                Console.WriteLine($"{folderName}: {outputFileName}");
+                Console.WriteLine($"Writing scaled: {Path.Combine(folderName, outputFileName)}");
                 ImageWriter.WriteImage(outputTotalPath, scaledCombinedImage);
-            }
+            });
         }
     }
 }

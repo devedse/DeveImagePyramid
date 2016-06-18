@@ -19,7 +19,7 @@ namespace Devedse.DeveImagePyramid
             bool useRealitvePixelScale = true;
 
             Console.WriteLine($"Starting generation of lowest level folder (+ conversion to {desiredExtension})");
-            //PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber);
+            PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber);
             Console.WriteLine();
 
             Console.WriteLine("Starting the scaling process...");

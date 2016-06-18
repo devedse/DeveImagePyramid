@@ -9,8 +9,12 @@ namespace Devedse.DeveImagePyramid
     public class PretzelImageCombined
     {
         private PretzelImage[,] _innerImages;
-        public int TileWidth { get; private set; }
-        public int TileHeight { get; private set; }
+
+        private int _tileWidth;
+        private int _tileHeight;
+
+        public int TileWidth { get { return _tileWidth; } }
+        public int TileHeight { get { return _tileHeight; } }
 
         public PretzelImageCombined(PretzelImage topLeft, PretzelImage bottomLeft, PretzelImage topRight, PretzelImage bottomRight)
         {
@@ -21,20 +25,20 @@ namespace Devedse.DeveImagePyramid
 
             _innerImages = new PretzelImage[,] { { topLeft, bottomLeft }, { topRight, bottomRight } };
 
-            TileWidth = topLeft.Width;
-            TileHeight = topLeft.Height;
+            _tileWidth = topLeft.Width;
+            _tileHeight = topLeft.Height;
         }
 
         public Pixel GetPixel(int x, int y)
         {
-            int xTile = x / TileWidth;
-            int yTile = y / TileHeight;
+            int xTile = x / _tileWidth;
+            int yTile = y / _tileHeight;
 
-            int xPos = x % TileWidth;
-            int yPos = y % TileHeight;
+            int xPos = x % _tileWidth;
+            int yPos = y % _tileHeight;
 
             var thisTile = _innerImages[xTile, yTile].Data;
-            var startPos = yPos * 3 * TileWidth + xPos * 3;
+            var startPos = yPos * 3 * _tileWidth + xPos * 3;
 
             byte r = thisTile[startPos + 0];
             byte g = thisTile[startPos + 1];
