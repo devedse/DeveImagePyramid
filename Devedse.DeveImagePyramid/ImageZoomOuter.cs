@@ -39,9 +39,9 @@ namespace Devedse.DeveImagePyramid
                     //BottomRight
                     AddPixel(combinedImage, scaledX + 1, scaledY + 1, ref r, ref g, ref b);
 
-                    byte averageR = (byte)(r / 4);
-                    byte averageG = (byte)(g / 4);
-                    byte averageB = (byte)(b / 4);
+                    var averageR = (byte)(r / 4);
+                    var averageG = (byte)(g / 4);
+                    var averageB = (byte)(b / 4);
 
                     var startPos = y * 3 * scaledOutputImage.Width + x * 3;
 

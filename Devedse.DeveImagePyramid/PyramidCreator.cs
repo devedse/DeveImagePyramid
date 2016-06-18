@@ -76,8 +76,8 @@ namespace Devedse.DeveImagePyramid
             else
             {
                 var expectedFilesInOutput = allFilesInInput.Count / 4;
-                int filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
-                int filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
+                //var filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
+                var filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
 
                 var scaleAction = new Action<int>( i =>
                 {

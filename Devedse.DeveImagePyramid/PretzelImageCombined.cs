@@ -8,10 +8,10 @@ namespace Devedse.DeveImagePyramid
 {
     public class PretzelImageCombined
     {
-        private PretzelImage[,] _innerImages;
+        private readonly PretzelImage[,] _innerImages;
 
-        private int _tileWidth;
-        private int _tileHeight;
+        private readonly int _tileWidth;
+        private readonly int _tileHeight;
 
         public int TileWidth { get { return _tileWidth; } }
         public int TileHeight { get { return _tileHeight; } }

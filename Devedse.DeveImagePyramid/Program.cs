@@ -68,7 +68,7 @@ namespace Devedse.DeveImagePyramid
 
             for (int i = 0; i < 1000; i++)
             {
-                var readImage = ImageReader.ReadImage(testImagePath);
+                ImageReader.ReadImage(testImagePath);
             }
             w.Stop();
             Console.WriteLine("Read: " + w.Elapsed);
