@@ -88,7 +88,6 @@ namespace Devedse.DeveImagePyramid
                 Marshal.Copy(lockedBits.Scan0, bytes, 0, bytes.Length);
 
                 var index = 0;
-                var builder = new StringBuilder();
 
                 for (var y = 0; y < lockedBits.Height; y++)
                 {

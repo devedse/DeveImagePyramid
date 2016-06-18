@@ -50,7 +50,8 @@ namespace Devedse.DeveImagePyramid
                 //LZW is about 4 times as fast as DEFLATE (on an SSD) but takes around 1.5 times the disk space
                 //Deflate is also better or equal to PngOut, probably due to using tiles here
                 //On a HDD DEFLATE was faster for some reason
-                tif.SetField(TiffTag.COMPRESSION, Compression.DEFLATE);
+                //It's still better in compression then PNG
+                tif.SetField(TiffTag.COMPRESSION, Compression.LZW);
 
                 //TileSizes lower then 16 are not supported so we write the image using scanlines here
                 if (pretzelImage.Width < 16 || pretzelImage.Height < 16)
@@ -87,43 +88,36 @@ namespace Devedse.DeveImagePyramid
 
         private static void WriteImagePng(string path, PretzelImage pretzelImage)
         {
-            //using (var image = new Bitmap(path))
-            //{
-            //    var imageWidth = image.Width;
-            //    var imageHeight = image.Height;
+            using (var image = new Bitmap(pretzelImage.Width, pretzelImage.Height, PixelFormat.Format24bppRgb))
+            {
+                var lockedBits = image.LockBits(new Rectangle(0, 0, pretzelImage.Width, pretzelImage.Height), ImageLockMode.WriteOnly, image.PixelFormat);
 
-            //    byte[] data = new byte[3 * imageWidth * imageHeight];
+                var outputBytes = new byte[lockedBits.Height * lockedBits.Stride];
 
-            //    var lockedBits = image.LockBits(new Rectangle(Point.Empty, image.Size), ImageLockMode.ReadOnly, image.PixelFormat);
+                const int pixelSize = 3;
+                var padding = lockedBits.Stride - (lockedBits.Width * pixelSize);
 
-            //    var pixelSize = lockedBits.PixelFormat == PixelFormat.Format32bppArgb ? 4 : 3; // only works with 32 or 24 pixel-size bitmap!
-            //    var padding = lockedBits.Stride - (lockedBits.Width * pixelSize);
-            //    var bytes = new byte[lockedBits.Height * lockedBits.Stride];
+                var index = 0;
+                for (int y = 0; y < pretzelImage.Height; y++)
+                {
+                    for (int x = 0; x < pretzelImage.Width; x++)
+                    {
+                        int startPos = y * image.Width * 3 + x * 3;
 
-            //    // copy the bytes from bitmap to array
-            //    Marshal.Copy(lockedBits.Scan0, bytes, 0, bytes.Length);
+                        outputBytes[index + 2] = pretzelImage.Data[startPos + 0];
+                        outputBytes[index + 1] = pretzelImage.Data[startPos + 1];
+                        outputBytes[index + 0] = pretzelImage.Data[startPos + 2];
 
-            //    var index = 0;
-            //    var builder = new StringBuilder();
+                        index += pixelSize;
+                    }
 
-            //    for (var y = 0; y < lockedBits.Height; y++)
-            //    {
-            //        for (var x = 0; x < lockedBits.Width; x++)
-            //        {
-            //            int startPos = y * image.Width + x;
+                    index += padding;
+                }
 
-            //            data[startPos + 0] = bytes[index + 2];
-            //            data[startPos + 1] = bytes[index + 1];
-            //            data[startPos + 2] = bytes[index + 0];
+                Marshal.Copy(outputBytes, 0, lockedBits.Scan0, outputBytes.Length);
 
-            //            index += pixelSize;
-            //        }
-
-            //        index += padding;
-            //    }
-
-            //    return new PretzelImage(data, imageWidth, imageHeight);
-            //}
+                image.Save(path, ImageFormat.Png);
+            }
         }
     }
 }
