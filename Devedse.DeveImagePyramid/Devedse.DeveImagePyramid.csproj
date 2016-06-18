@@ -48,9 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ImageZoomOuter.cs" />
     <Compile Include="ImageWriter.cs" />
     <Compile Include="ImageReader.cs" />
+    <Compile Include="Pixel.cs" />
     <Compile Include="PretzelImage.cs" />
+    <Compile Include="PretzelImageCombined.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

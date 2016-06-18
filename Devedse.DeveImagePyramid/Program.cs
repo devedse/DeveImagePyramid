@@ -12,6 +12,28 @@ namespace Devedse.DeveImagePyramid
     {
         static void Main(string[] args)
         {
+            ScaleTest();
+
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        private static void ScaleTest()
+        {
+            var topLeft = ImageReader.ReadImage("0_0.tiff");
+            var bottomLeft = ImageReader.ReadImage("0_1.tiff");
+            var topRight = ImageReader.ReadImage("1_0.tiff");
+            var bottomRight = ImageReader.ReadImage("1_1.tiff");
+
+            var combinedImage = new PretzelImageCombined(topLeft, bottomLeft, topRight, bottomRight);
+
+            var scaledImage = ImageZoomOuter.Scale(combinedImage);
+
+            ImageWriter.WriteImage("scaledImage.tiff", scaledImage);
+        }
+
+        private static void PerfTest()
+        {
             var ext = ".tiff";
 
             ImageWriter.WriteImage("testje.png", ImageReader.ReadImage("0_0.png"));
@@ -42,9 +64,6 @@ namespace Devedse.DeveImagePyramid
             w.Stop();
 
             Console.WriteLine("Write: " + w.Elapsed);
-
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey();
         }
     }
 }
