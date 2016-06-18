@@ -52,11 +52,13 @@
     <Compile Include="ImageZoomOuter.cs" />
     <Compile Include="ImageWriter.cs" />
     <Compile Include="ImageReader.cs" />
+    <Compile Include="MathHelper.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="PretzelImage.cs" />
     <Compile Include="PretzelImageCombined.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PyramidCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

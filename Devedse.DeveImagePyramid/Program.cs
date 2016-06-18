@@ -16,39 +16,28 @@ namespace Devedse.DeveImagePyramid
             string outputFolder = @"C:\#ImageScalerOutput";
             string desiredExtension = ".tiff";
             int deepestFolderNumber = 15;
+            bool useRealitvePixelScale = true;
 
+            Console.WriteLine($"Starting generation of lowest level folder (+ conversion to {desiredExtension})");
+            //PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber);
+            Console.WriteLine();
 
-            MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber);
+            Console.WriteLine("Starting the scaling process...");
+            for (int i = deepestFolderNumber - 1; i >= 1; i--)
+            {
+                var destFolder = Path.Combine(outputFolder, i.ToString());
+                var srcFolder = Path.Combine(outputFolder, (i + 1).ToString());
 
+                Console.WriteLine($"Starting with scale {i}");
+                PyramidCreator.CreatePyramid(srcFolder, destFolder, desiredExtension, useRealitvePixelScale);
+                Console.WriteLine();
+            }
 
-            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine("Completed, press any key to continue...");
             Console.ReadKey();
         }
 
-        private static void MoveInputToOutputAndConvert(string inputFolder, string outputFolder, string desiredExtension, int deepestFolderNumber)
-        {
-            var outputForThis = Path.Combine(outputFolder, deepestFolderNumber.ToString());
-            Directory.CreateDirectory(outputForThis);
 
-            var filesInDirectory = Directory.GetFiles(inputFolder);
-
-
-            Parallel.ForEach(filesInDirectory, filePath =>
-            {
-                var extension = Path.GetExtension(filePath);
-                if (FileExtensionHelper.IsValidImageFileExtension(extension))
-                {
-                    var readImage = ImageReader.ReadImage(filePath);
-
-                    var outputFileName = Path.GetFileNameWithoutExtension(filePath);
-                    var outputFileNameWithExtension = outputFileName + desiredExtension;
-                    var totalOutputPath = Path.Combine(outputForThis, outputFileNameWithExtension);
-
-                    Console.WriteLine($"Writing: {outputFileNameWithExtension}");
-                    ImageWriter.WriteImage(totalOutputPath, readImage);
-                }
-            });
-        }
 
         private static void ScaleTest()
         {
