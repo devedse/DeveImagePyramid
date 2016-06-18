@@ -13,14 +13,13 @@ namespace Devedse.DeveImagePyramid
         static void Main(string[] args)
         {
             string inputFolder = @"C:\TheFolder\Github\DeveMazeGenerator\DeveMazeGeneratorGui\bin\Release\MegaTerrorMaze-DynamicPath-WithTiles-NoColorMap";
-            string outputFolder = @"C:\#ImageScalerOutput";
-            string desiredExtension = ".tiff";
+            string outputFolder = @"D:\#ImageScalerOutput\mydz_files";
+            string desiredExtension = ".png";
             int deepestFolderNumber = 15;
-            bool useRealitvePixelScale = true;
             bool useParallel = true;
 
             Console.WriteLine($"Starting generation of lowest level folder (+ conversion to {desiredExtension})");
-            //PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber, useParallel);
+            PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber, useParallel);
             Console.WriteLine();
 
             Console.WriteLine("Starting the scaling process...");
@@ -30,7 +29,7 @@ namespace Devedse.DeveImagePyramid
                 var srcFolder = Path.Combine(outputFolder, (i + 1).ToString());
 
                 Console.WriteLine($"Starting with scale {i}");
-                PyramidCreator.CreatePyramid(srcFolder, destFolder, desiredExtension, useRealitvePixelScale, useParallel);
+                PyramidCreator.CreatePyramid(srcFolder, destFolder, desiredExtension, useParallel);
                 Console.WriteLine();
             }
 
@@ -49,7 +48,7 @@ namespace Devedse.DeveImagePyramid
 
             var combinedImage = new PretzelImageCombined(topLeft, bottomLeft, topRight, bottomRight);
 
-            var scaledImage = ImageZoomOuter.Scale(combinedImage, false);
+            var scaledImage = ImageZoomOuter.ScaleV2(combinedImage);
 
             ImageWriter.WriteImage("scaledImage.tiff", scaledImage);
         }

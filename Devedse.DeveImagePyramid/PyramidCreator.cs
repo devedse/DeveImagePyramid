@@ -45,7 +45,7 @@ namespace Devedse.DeveImagePyramid
             }
         }
 
-        public static void CreatePyramid(string inputFolder, string outputFolder, string desiredExtension, bool useRealitvePixelScale, bool useParallel)
+        public static void CreatePyramid(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
         {
             var allFilesInInput = Directory.GetFiles(inputFolder).Where(t => FileExtensionHelper.IsValidImageFileExtension(Path.GetExtension(t))).ToList();
             if (!MathHelper.IsPowerOfTwo(allFilesInInput.Count))
@@ -65,7 +65,7 @@ namespace Devedse.DeveImagePyramid
                 var singleImage = ImageReader.ReadImage(inputTotalPath);
 
                 var combinedImage = new PretzelImageCombined(singleImage);
-                var scaledCombinedImage = ImageZoomOuter.Scale(combinedImage, useRealitvePixelScale);
+                var scaledCombinedImage = ImageZoomOuter.ScaleV2(combinedImage);
                 
                 var outputFileName = $"0_0{foundExtension}";
                 var outputTotalPath = Path.Combine(outputFolder, outputFileName);
@@ -100,7 +100,7 @@ namespace Devedse.DeveImagePyramid
                     var bottomRight = ImageReader.ReadImage(bottomRightTotalPath);
 
                     var combinedImage = new PretzelImageCombined(topLeft, bottomLeft, topRight, bottomRight);
-                    var scaledCombinedImage = ImageZoomOuter.Scale(combinedImage, useRealitvePixelScale);
+                    var scaledCombinedImage = ImageZoomOuter.ScaleV2(combinedImage);
 
                     var outputFileName = $"{xStart / 2}_{yStart / 2}{desiredExtension}";
                     var outputTotalPath = Path.Combine(outputFolder, outputFileName);
