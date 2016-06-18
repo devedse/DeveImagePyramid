@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileExtensionHelper.cs" />
     <Compile Include="ImageZoomOuter.cs" />
     <Compile Include="ImageWriter.cs" />
     <Compile Include="ImageReader.cs" />

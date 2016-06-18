@@ -51,7 +51,7 @@ namespace Devedse.DeveImagePyramid
                 //Deflate is also better or equal to PngOut, probably due to using tiles here
                 //On a HDD DEFLATE was faster for some reason
                 //It's still better in compression then PNG
-                tif.SetField(TiffTag.COMPRESSION, Compression.LZW);
+                tif.SetField(TiffTag.COMPRESSION, Compression.DEFLATE);
 
                 //TileSizes lower then 16 are not supported so we write the image using scanlines here
                 if (pretzelImage.Width < 16 || pretzelImage.Height < 16)

@@ -12,10 +12,42 @@ namespace Devedse.DeveImagePyramid
     {
         static void Main(string[] args)
         {
-            ScaleTest();
+            string inputFolder = @"C:\TheFolder\Github\DeveMazeGenerator\DeveMazeGeneratorGui\bin\Release\MegaTerrorMaze-DynamicPath-WithTiles-NoColorMap";
+            string outputFolder = @"C:\#ImageScalerOutput";
+            string desiredExtension = ".tiff";
+            int deepestFolderNumber = 15;
+
+
+            MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber);
+
 
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
+        }
+
+        private static void MoveInputToOutputAndConvert(string inputFolder, string outputFolder, string desiredExtension, int deepestFolderNumber)
+        {
+            var outputForThis = Path.Combine(outputFolder, deepestFolderNumber.ToString());
+            Directory.CreateDirectory(outputForThis);
+
+            var filesInDirectory = Directory.GetFiles(inputFolder);
+
+
+            Parallel.ForEach(filesInDirectory, filePath =>
+            {
+                var extension = Path.GetExtension(filePath);
+                if (FileExtensionHelper.IsValidImageFileExtension(extension))
+                {
+                    var readImage = ImageReader.ReadImage(filePath);
+
+                    var outputFileName = Path.GetFileNameWithoutExtension(filePath);
+                    var outputFileNameWithExtension = outputFileName + desiredExtension;
+                    var totalOutputPath = Path.Combine(outputForThis, outputFileNameWithExtension);
+
+                    Console.WriteLine($"Writing: {outputFileNameWithExtension}");
+                    ImageWriter.WriteImage(totalOutputPath, readImage);
+                }
+            });
         }
 
         private static void ScaleTest()
