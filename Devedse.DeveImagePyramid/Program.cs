@@ -17,9 +17,10 @@ namespace Devedse.DeveImagePyramid
             string desiredExtension = ".tiff";
             int deepestFolderNumber = 15;
             bool useRealitvePixelScale = true;
+            bool useParallel = true;
 
             Console.WriteLine($"Starting generation of lowest level folder (+ conversion to {desiredExtension})");
-            PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber);
+            //PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber, useParallel);
             Console.WriteLine();
 
             Console.WriteLine("Starting the scaling process...");
@@ -29,7 +30,7 @@ namespace Devedse.DeveImagePyramid
                 var srcFolder = Path.Combine(outputFolder, (i + 1).ToString());
 
                 Console.WriteLine($"Starting with scale {i}");
-                PyramidCreator.CreatePyramid(srcFolder, destFolder, desiredExtension, useRealitvePixelScale);
+                PyramidCreator.CreatePyramid(srcFolder, destFolder, desiredExtension, useRealitvePixelScale, useParallel);
                 Console.WriteLine();
             }
 

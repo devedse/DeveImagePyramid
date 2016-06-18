@@ -12,11 +12,14 @@ namespace Devedse.DeveImagePyramid
         {
             //If the bool useRealitvePixelScale is true we want to count diagonal pixels only 0.25 of the times as the main pixel etc
 
-            var outputBytes = new byte[combinedImage.TileWidth * combinedImage.TileHeight * 3];
-            var scaledOutputImage = new PretzelImage(outputBytes, combinedImage.TileWidth, combinedImage.TileHeight);
+            int newImageWidth = combinedImage.Width / 2;
+            int newImageHeight = combinedImage.Height / 2;
 
-            int combinedImageWidth = scaledOutputImage.Width * 2;
-            int combinedImageHeight = scaledOutputImage.Height * 2;
+            var outputBytes = new byte[newImageWidth * newImageHeight * 3];
+            var scaledOutputImage = new PretzelImage(outputBytes, newImageWidth, newImageHeight);
+
+            int combinedImageWidth = combinedImage.Width;
+            int combinedImageHeight = combinedImage.Height;
 
             for (int y = 0; y < scaledOutputImage.Height; y++)
             {

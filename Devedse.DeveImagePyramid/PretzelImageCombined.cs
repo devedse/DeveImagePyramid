@@ -16,6 +16,20 @@ namespace Devedse.DeveImagePyramid
         public int TileWidth { get { return _tileWidth; } }
         public int TileHeight { get { return _tileHeight; } }
 
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+
+        public PretzelImageCombined(PretzelImage singleImage)
+        {
+            _innerImages = new PretzelImage[,] { { singleImage } };
+
+            _tileWidth = singleImage.Width;
+            _tileHeight = singleImage.Height;
+
+            Width = _tileWidth;
+            Height = _tileHeight;
+        }
+
         public PretzelImageCombined(PretzelImage topLeft, PretzelImage bottomLeft, PretzelImage topRight, PretzelImage bottomRight)
         {
             if (topLeft.Width != topRight.Width || topRight.Width != bottomLeft.Width || bottomLeft.Width != bottomRight.Width || topLeft.Height != topRight.Height || topRight.Height != bottomLeft.Height || bottomLeft.Height != bottomRight.Height)
@@ -27,6 +41,9 @@ namespace Devedse.DeveImagePyramid
 
             _tileWidth = topLeft.Width;
             _tileHeight = topLeft.Height;
+
+            Width = _tileWidth * 2;
+            Height = _tileHeight * 2;
         }
 
         public Pixel GetPixel(int x, int y)
