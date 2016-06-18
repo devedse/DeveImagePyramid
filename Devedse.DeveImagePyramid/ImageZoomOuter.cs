@@ -8,8 +8,10 @@ namespace Devedse.DeveImagePyramid
 {
     public static class ImageZoomOuter
     {
-        public static PretzelImage Scale(PretzelImageCombined combinedImage)
+        public static PretzelImage Scale(PretzelImageCombined combinedImage, bool useRealitvePixelScale)
         {
+            //If the bool useRealitvePixelScale is true we want to count diagonal pixels only 0.25 of the times as the main pixel etc
+
             var outputBytes = new byte[combinedImage.TileWidth * combinedImage.TileHeight * 3];
             var scaledOutputImage = new PretzelImage(outputBytes, combinedImage.TileWidth, combinedImage.TileHeight);
 
@@ -54,26 +56,26 @@ namespace Devedse.DeveImagePyramid
                     if (scaledX > 0)
                     {
                         //Left
-                        AddPixelNumberOfTimes(combinedImage, 2, scaledX - 1, scaledY, ref r, ref g, ref b, ref count);
+                        AddPixelNumberOfTimes(combinedImage, useRealitvePixelScale ? 2 : 1, scaledX - 1, scaledY, ref r, ref g, ref b, ref count);
                     }
                     if (scaledX < combinedImageWidth)
                     {
                         //Right
-                        AddPixelNumberOfTimes(combinedImage, 2, scaledX + 1, scaledY, ref r, ref g, ref b, ref count);
+                        AddPixelNumberOfTimes(combinedImage, useRealitvePixelScale ? 2 : 1, scaledX + 1, scaledY, ref r, ref g, ref b, ref count);
                     }
                     if (scaledY > 0)
                     {
                         //Top
-                        AddPixelNumberOfTimes(combinedImage, 2, scaledX, scaledY - 1, ref r, ref g, ref b, ref count);
+                        AddPixelNumberOfTimes(combinedImage, useRealitvePixelScale ? 2 : 1, scaledX, scaledY - 1, ref r, ref g, ref b, ref count);
                     }
                     if (scaledY < combinedImageHeight)
                     {
                         //Bottom
-                        AddPixelNumberOfTimes(combinedImage, 2, scaledX, scaledY + 1, ref r, ref g, ref b, ref count);
+                        AddPixelNumberOfTimes(combinedImage, useRealitvePixelScale ? 2 : 1, scaledX, scaledY + 1, ref r, ref g, ref b, ref count);
                     }
 
                     //Pixel itself 4 times
-                    AddPixelNumberOfTimes(combinedImage, 4, scaledX, scaledY, ref r, ref g, ref b, ref count);
+                    AddPixelNumberOfTimes(combinedImage, useRealitvePixelScale ? 4 : 1, scaledX, scaledY, ref r, ref g, ref b, ref count);
 
                     byte averageR = (byte)(r / count);
                     byte averageG = (byte)(g / count);

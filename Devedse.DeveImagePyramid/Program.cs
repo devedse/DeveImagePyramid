@@ -27,7 +27,7 @@ namespace Devedse.DeveImagePyramid
 
             var combinedImage = new PretzelImageCombined(topLeft, bottomLeft, topRight, bottomRight);
 
-            var scaledImage = ImageZoomOuter.Scale(combinedImage);
+            var scaledImage = ImageZoomOuter.Scale(combinedImage, false);
 
             ImageWriter.WriteImage("scaledImage.tiff", scaledImage);
         }
