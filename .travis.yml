@@ -1,6 +1,6 @@
 language: csharp
 solution: Devedse.DeveImagePyramid.sln
-script:
+after_success:
   - zip Release.zip "/home/travis/build/devedse/DeveImagePyramid/Devedse.DeveImagePyramid/bin/Release/*.*"
 deploy:
   provider: releases
