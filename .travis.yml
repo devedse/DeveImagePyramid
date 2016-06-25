@@ -1,7 +1,7 @@
 language: csharp
 solution: Devedse.DeveImagePyramid.sln
 after_success:
-  - zip "/home/travis/build/devedse/DeveImagePyramid/Release.zip" "/home/travis/build/devedse/DeveImagePyramid/Devedse.DeveImagePyramid/bin/Release/"
+  - zip "/home/travis/build/devedse/DeveImagePyramid/Release.zip" "/home/travis/build/devedse/DeveImagePyramid/Devedse.DeveImagePyramid/bin/Release/*"
 deploy:
   provider: releases
   api_key:
