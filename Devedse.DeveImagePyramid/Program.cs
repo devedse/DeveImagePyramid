@@ -15,11 +15,10 @@ namespace Devedse.DeveImagePyramid
             string inputFolder = @"C:\TheFolder\Github\DeveMazeGenerator\DeveMazeGeneratorGui\bin\Release\MegaTerrorMaze-DynamicPath-WithTiles-NoColorMap";
             string outputFolder = @"D:\#ImageScalerOutput\mydz_files";
             string desiredExtension = ".png";
-            int deepestFolderNumber = 15;
             bool useParallel = true;
 
             Console.WriteLine($"Starting generation of lowest level folder (+ conversion to {desiredExtension})");
-            PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, deepestFolderNumber, useParallel);
+            int deepestFolderNumber = PyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, useParallel);
             Console.WriteLine();
 
             Console.WriteLine("Starting the scaling process...");

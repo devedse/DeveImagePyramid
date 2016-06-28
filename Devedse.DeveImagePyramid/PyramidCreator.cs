@@ -19,6 +19,12 @@ namespace Devedse.DeveImagePyramid
             var firstImagePath = Path.Combine(inputFolder, firstImageFileName);
             var firstImage = ImageReader.ReadImage(firstImagePath);
 
+            int filesInInputCount = filesInDirectory.Count();
+            int filesInWidthAndHeight = (int)Math.Sqrt(filesInInputCount);
+            int sizeInWidthAndHeight = filesInWidthAndHeight * firstImage.Width;
+
+            int deepestFolderNumber = (int)Math.Log(sizeInWidthAndHeight, 2);
+
             var outputForThis = Path.Combine(outputFolder, deepestFolderNumber.ToString());
             Directory.CreateDirectory(outputForThis);
             var fileConversionAction = new Action<string>(filePath =>
