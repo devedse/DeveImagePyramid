@@ -9,13 +9,18 @@ namespace Devedse.DeveImagePyramid
 {
     public static class PyramidCreator
     {
-        public static void MoveInputToOutputAndConvert(string inputFolder, string outputFolder, string desiredExtension, int deepestFolderNumber, bool useParallel)
+        public static int MoveInputToOutputAndConvert(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
         {
-            var outputForThis = Path.Combine(outputFolder, deepestFolderNumber.ToString());
-            Directory.CreateDirectory(outputForThis);
-
             var filesInDirectory = Directory.GetFiles(inputFolder);
 
+            var foundExtension = filesInDirectory.Select(t => Path.GetExtension(t)).Distinct().SingleOrDefault();
+
+            var firstImageFileName = $"0_0{foundExtension}";
+            var firstImagePath = Path.Combine(inputFolder, firstImageFileName);
+            var firstImage = ImageReader.ReadImage(firstImagePath);
+
+            var outputForThis = Path.Combine(outputFolder, deepestFolderNumber.ToString());
+            Directory.CreateDirectory(outputForThis);
             var fileConversionAction = new Action<string>(filePath =>
             {
                 var extension = Path.GetExtension(filePath);
@@ -43,6 +48,8 @@ namespace Devedse.DeveImagePyramid
                     fileConversionAction(filePath);
                 }
             }
+
+            return deepestFolderNumber;
         }
 
         public static void CreatePyramid(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
