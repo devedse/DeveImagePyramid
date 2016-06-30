@@ -1,9 +1,10 @@
 version: 1.0.{build}
+skip_tags: true
 configuration: Release
 before_build:
 - cmd: nuget restore
 build:
-  verbosity: minimal
+  verbosity: detailed
 after_build:
 - cmd: Scripts\GoRepack.cmd
 artifacts:
