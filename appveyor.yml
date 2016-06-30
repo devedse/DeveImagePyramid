@@ -4,7 +4,7 @@ configuration: Release
 before_build:
 - cmd: nuget restore
 build:
-  verbosity: detailed
+  verbosity: minimal
 after_build:
 - cmd: Scripts\GoRepack.cmd
 artifacts:
