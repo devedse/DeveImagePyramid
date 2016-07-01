@@ -1,2 +1,4 @@
 language: csharp
 solution: Devedse.DeveImagePyramid.sln
+notifications:
+  email: false
