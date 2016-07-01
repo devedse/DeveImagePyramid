@@ -37,7 +37,6 @@ namespace Devedse.DeveImagePyramid
         }
 
 
-
         private static void ScaleTest()
         {
             var topLeft = ImageReader.ReadImage("0_0.tiff");
