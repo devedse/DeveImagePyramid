@@ -1,4 +1,5 @@
 ﻿using BitMiracle.LibTiff.Classic;
+using Devedse.DeveImagePyramid.Logging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,33 +12,50 @@ using System.Threading.Tasks;
 
 namespace Devedse.DeveImagePyramid
 {
-    public static class ImageWriter
+    public class ImageWriter
     {
-        public static void WriteImage(string path, PretzelImage pretzelImage)
+        private readonly RetryHandler _retryHandler;
+        private readonly ILogger _logger;
+
+        public ImageWriter(RetryHandler retryHandler, ILogger logger)
+        {
+            _retryHandler = retryHandler;
+            _logger = logger;
+        }
+
+        public void WriteImage(string path, PretzelImage pretzelImage)
         {
             var extension = Path.GetExtension(path);
 
+            Action saveAction;
+
             if (extension == ".tiff" || extension == ".tif")
             {
-                WriteImageTiff(path, pretzelImage);
+                saveAction = () => WriteImageTiff(path, pretzelImage);
             }
             else if (extension == ".png")
             {
-                WriteImagePng(path, pretzelImage);
+                saveAction = () => WriteImagePng(path, pretzelImage);
             }
             else
             {
-                throw new NotSupportedException($"We don't support images with the extension: {extension}");
+                var exceptionString = $"We don't support images with the extension: {extension}";
+                _logger.WriteError(exceptionString, LogLevel.Exception);
+                throw new NotSupportedException(exceptionString);
             }
+
+            _retryHandler.Retry(saveAction, 10);
         }
 
-        private static void WriteImageTiff(string path, PretzelImage pretzelImage)
+        private void WriteImageTiff(string path, PretzelImage pretzelImage)
         {
             using (var tif = Tiff.Open(path, "w"))
             {
                 if (tif == null)
                 {
-                    throw new InvalidOperationException("Tif file could not be opened. It is probably in use: " + path);
+                    var exceptionString = $"Tif file could not be opened. It is probably in use: {path}";
+                    _logger.WriteError(exceptionString, LogLevel.Exception);
+                    throw new InvalidOperationException(exceptionString);
                 }
 
                 tif.SetField(TiffTag.IMAGEWIDTH, pretzelImage.Width);

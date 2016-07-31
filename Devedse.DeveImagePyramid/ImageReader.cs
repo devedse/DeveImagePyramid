@@ -1,4 +1,5 @@
 ﻿using BitMiracle.LibTiff.Classic;
+using Devedse.DeveImagePyramid.Logging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -11,9 +12,16 @@ using System.Threading.Tasks;
 
 namespace Devedse.DeveImagePyramid
 {
-    public static class ImageReader
+    public class ImageReader
     {
-        public static PretzelImage ReadImage(string path)
+        private readonly ILogger _logger;
+
+        public ImageReader(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public PretzelImage ReadImage(string path)
         {
             var extension = Path.GetExtension(path);
 
@@ -28,7 +36,7 @@ namespace Devedse.DeveImagePyramid
             throw new NotSupportedException($"We don't support images with the extension: {extension}");
         }
 
-        private static PretzelImage ReadImageTiff(string path)
+        private PretzelImage ReadImageTiff(string path)
         {
             using (var tiff = Tiff.Open(path, "r"))
             {

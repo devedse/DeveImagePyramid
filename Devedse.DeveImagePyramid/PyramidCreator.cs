@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Devedse.DeveImagePyramid.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,92 +8,162 @@ using System.Threading.Tasks;
 
 namespace Devedse.DeveImagePyramid
 {
-    public static class PyramidCreator
+    public class PyramidCreator
     {
-        public static int MoveInputToOutputAndConvert(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
-        {
-            var filesInDirectory = Directory.GetFiles(inputFolder);
+        private readonly ILogger _logger;
+        private readonly ImageWriter _imageWriter;
+        private readonly ImageReader _imageReader;
 
-            var foundExtension = filesInDirectory.Select(t => Path.GetExtension(t)).Distinct().SingleOrDefault();
+        public PyramidCreator(ImageWriter imageWriter, ImageReader imageReader, ILogger logger)
+        {
+            _imageWriter = imageWriter;
+            _imageReader = imageReader;
+            _logger = logger;
+        }
+
+        public int MoveInputToOutputAndConvert(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
+        {
+            _logger.Write("Counting all files from input directory...");
+
+            var filesInDirectoryEnumerable = Directory.EnumerateFiles(inputFolder).Where(t => FileExtensionHelper.IsValidImageFileExtension(Path.GetExtension(t)));
+
+            var filesInInputCount = 0;
+            var foundExtensions = new HashSet<string>();
+
+            foreach (var foundFile in filesInDirectoryEnumerable)
+            {
+                filesInInputCount++;
+
+                var extension = Path.GetExtension(foundFile);
+                foundExtensions.Add(extension);
+            }
+
+            _logger.Write($"Found {filesInInputCount} files in {inputFolder}");
+
+            if (foundExtensions.Count != 1)
+            {
+                var exceptionString = $"Did not find exactly 1 file extension. Found '{foundExtensions.Count}' extensions instead. Extensions: {string.Join(",", foundExtensions)}.";
+                _logger.WriteError(exceptionString, LogLevel.Exception);
+                throw new InvalidOperationException(exceptionString);
+            }
+
+            var foundExtension = foundExtensions.Single();
+
+            _logger.Write($"Found extension: '{foundExtension}'");
 
             var firstImageFileName = $"0_0{foundExtension}";
             var firstImagePath = Path.Combine(inputFolder, firstImageFileName);
-            var firstImage = ImageReader.ReadImage(firstImagePath);
+            var firstImage = _imageReader.ReadImage(firstImagePath);
 
-            int filesInInputCount = filesInDirectory.Count();
             int filesInWidthAndHeight = (int)Math.Sqrt(filesInInputCount);
             int sizeInWidthAndHeight = filesInWidthAndHeight * firstImage.Width;
 
             int deepestFolderNumber = (int)Math.Log(sizeInWidthAndHeight, 2);
 
             var outputForThis = Path.Combine(outputFolder, deepestFolderNumber.ToString());
+            _logger.Write($"Creating output directory: '{outputForThis}'");
             Directory.CreateDirectory(outputForThis);
             var fileConversionAction = new Action<string>(filePath =>
             {
                 var extension = Path.GetExtension(filePath);
                 if (FileExtensionHelper.IsValidImageFileExtension(extension))
                 {
-                    var readImage = ImageReader.ReadImage(filePath);
+                    var readImage = _imageReader.ReadImage(filePath);
 
                     var outputFileName = Path.GetFileNameWithoutExtension(filePath);
                     var outputFileNameWithExtension = outputFileName + desiredExtension;
                     var totalOutputPath = Path.Combine(outputForThis, outputFileNameWithExtension);
 
-                    Console.WriteLine($"Writing: {outputFileNameWithExtension}");
-                    ImageWriter.WriteImage(totalOutputPath, readImage);
+                    _logger.Write($"Writing: {outputFileNameWithExtension}", LogLevel.Verbose);
+                    _imageWriter.WriteImage(totalOutputPath, readImage);
                 }
             });
 
+            _logger.Write("Starting conversion/copy of images...", color: ConsoleColor.Yellow);
+
             if (useParallel)
             {
-                Parallel.ForEach(filesInDirectory, fileConversionAction);
+                Parallel.ForEach(filesInDirectoryEnumerable, fileConversionAction);
             }
             else
             {
-                foreach (var filePath in filesInDirectory)
+                foreach (var filePath in filesInDirectoryEnumerable)
                 {
                     fileConversionAction(filePath);
                 }
             }
 
+            _logger.Write("Completed conversion/copy of images.", color: ConsoleColor.Green);
+
             return deepestFolderNumber;
         }
 
-        public static void CreatePyramid(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
+        public void CreatePyramid(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
         {
-            var allFilesInInput = Directory.GetFiles(inputFolder).Where(t => FileExtensionHelper.IsValidImageFileExtension(Path.GetExtension(t))).ToList();
-            if (!MathHelper.IsPowerOfTwo(allFilesInInput.Count))
-            {
-                throw new InvalidOperationException("Amount of files in input directory is not a power of 2");
-            }
-            var foundExtension = allFilesInInput.Select(t => Path.GetExtension(t)).Distinct().SingleOrDefault();
+            _logger.Write("Counting all files from input directory...");
 
+            var allFilesInInputEnumerable = Directory.EnumerateFiles(inputFolder).Where(t => FileExtensionHelper.IsValidImageFileExtension(Path.GetExtension(t)));
+
+            var filesInInputCount = 0;
+            var foundExtensions = new HashSet<string>();
+
+            foreach (var foundFile in allFilesInInputEnumerable)
+            {
+                filesInInputCount++;
+
+                var extension = Path.GetExtension(foundFile);
+                foundExtensions.Add(extension);
+            }
+
+            _logger.Write($"Found {filesInInputCount} files in {inputFolder}");
+
+            if (foundExtensions.Count != 1)
+            {
+                var exceptionString = $"Did not find exactly 1 file extension. Found '{foundExtensions.Count}' extensions instead. Extensions: {string.Join(",", foundExtensions)}.";
+                _logger.WriteError(exceptionString, LogLevel.Exception);
+                throw new InvalidOperationException(exceptionString);
+            }
+
+            var foundExtension = foundExtensions.Single();
+
+            _logger.Write($"Found extension: '{foundExtension}'");
+
+            if (!MathHelper.IsPowerOfTwo(filesInInputCount))
+            {
+                var exceptionString = "Amount of files in input directory is not a power of 2";
+                _logger.WriteError(exceptionString, LogLevel.Exception);
+                throw new InvalidOperationException(exceptionString);
+            }
+
+            _logger.Write($"Creating output directory: '{outputFolder}'");
             Directory.CreateDirectory(outputFolder);
 
             var folderName = Path.GetFileName(outputFolder);
 
-            if (allFilesInInput.Count == 1)
+            _logger.Write("Starting scaling of images...", color: ConsoleColor.Yellow);
+
+            if (filesInInputCount == 1)
             {
                 var inputFileName = $"0_0{foundExtension}";
                 var inputTotalPath = Path.Combine(inputFolder, inputFileName);
-                var singleImage = ImageReader.ReadImage(inputTotalPath);
+                var singleImage = _imageReader.ReadImage(inputTotalPath);
 
                 var combinedImage = new PretzelImageCombined(singleImage);
                 var scaledCombinedImage = ImageZoomOuter.ScaleV2(combinedImage);
-                
+
                 var outputFileName = $"0_0{foundExtension}";
                 var outputTotalPath = Path.Combine(outputFolder, outputFileName);
 
-                Console.WriteLine($"Writing scaled: {Path.Combine(folderName, outputFileName)}");
-                ImageWriter.WriteImage(outputTotalPath, scaledCombinedImage);
+                _logger.Write($"Writing scaled: {Path.Combine(folderName, outputFileName)}", LogLevel.Verbose);
+                _imageWriter.WriteImage(outputTotalPath, scaledCombinedImage);
             }
             else
             {
-                var expectedFilesInOutput = allFilesInInput.Count / 4;
+                var expectedFilesInOutput = filesInInputCount / 4;
                 //var filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
                 var filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
 
-                var scaleAction = new Action<int>( i =>
+                var scaleAction = new Action<int>(i =>
                 {
                     int xStart = (i % filesInHeight) * 2;
                     int yStart = (i / filesInHeight) * 2;
@@ -107,10 +178,10 @@ namespace Devedse.DeveImagePyramid
                     var topRightTotalPath = Path.Combine(inputFolder, topRightFileName);
                     var bottomRightTotalPath = Path.Combine(inputFolder, bottomRightFileName);
 
-                    var topLeft = ImageReader.ReadImage(topLeftTotalPath);
-                    var bottomLeft = ImageReader.ReadImage(bottomLeftTotalPath);
-                    var topRight = ImageReader.ReadImage(topRightTotalPath);
-                    var bottomRight = ImageReader.ReadImage(bottomRightTotalPath);
+                    var topLeft = _imageReader.ReadImage(topLeftTotalPath);
+                    var bottomLeft = _imageReader.ReadImage(bottomLeftTotalPath);
+                    var topRight = _imageReader.ReadImage(topRightTotalPath);
+                    var bottomRight = _imageReader.ReadImage(bottomRightTotalPath);
 
                     var combinedImage = new PretzelImageCombined(topLeft, bottomLeft, topRight, bottomRight);
                     var scaledCombinedImage = ImageZoomOuter.ScaleV2(combinedImage);
@@ -118,8 +189,8 @@ namespace Devedse.DeveImagePyramid
                     var outputFileName = $"{xStart / 2}_{yStart / 2}{desiredExtension}";
                     var outputTotalPath = Path.Combine(outputFolder, outputFileName);
 
-                    Console.WriteLine($"Writing scaled: {Path.Combine(folderName, outputFileName)}");
-                    ImageWriter.WriteImage(outputTotalPath, scaledCombinedImage);
+                    _logger.Write($"Writing scaled: {Path.Combine(folderName, outputFileName)}", LogLevel.Verbose);
+                    _imageWriter.WriteImage(outputTotalPath, scaledCombinedImage);
                 });
 
                 if (useParallel)
@@ -134,6 +205,8 @@ namespace Devedse.DeveImagePyramid
                     }
                 }
             }
+
+            _logger.Write("Completed scaling of images.", color: ConsoleColor.Green);
         }
     }
 }
