@@ -20,6 +20,7 @@ namespace Devedse.DeveImagePyramid
                 try
                 {
                     actionToExecute();
+                    return;
                 }
                 catch (Exception ex)
                 {
