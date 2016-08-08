@@ -104,8 +104,10 @@ namespace Devedse.DeveImagePyramid
             }
         }
 
-        private static void WriteImagePng(string path, PretzelImage pretzelImage)
+        private void WriteImagePng(string path, PretzelImage pretzelImage)
         {
+            _logger.Write($"Writing image Png: {path}, PretzelImage.Width: {pretzelImage.Width} PretzelImage.Height: {pretzelImage.Height} PretzelImage.Data.Length: {pretzelImage.Data.Length}", LogLevel.Verbose);
+
             using (var image = new Bitmap(pretzelImage.Width, pretzelImage.Height, PixelFormat.Format24bppRgb))
             {
                 var lockedBits = image.LockBits(new Rectangle(0, 0, pretzelImage.Width, pretzelImage.Height), ImageLockMode.WriteOnly, image.PixelFormat);
