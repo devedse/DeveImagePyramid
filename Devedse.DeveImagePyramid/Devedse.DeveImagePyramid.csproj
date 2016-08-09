@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileExtensionHelper.cs" />
+    <Compile Include="InputInformation.cs" />
     <Compile Include="Logging\Appenders\DateTimeLoggerAppender.cs" />
     <Compile Include="Logging\Appenders\LoggingLevelLoggerAppender.cs" />
     <Compile Include="Logging\ConsoleLogger.cs" />

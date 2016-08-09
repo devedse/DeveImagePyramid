@@ -25,37 +25,13 @@ namespace Devedse.DeveImagePyramid
         {
             _logger.Write("Counting all files from input directory...");
 
-            var filesInDirectoryEnumerable = Directory.EnumerateFiles(inputFolder).Where(t => FileExtensionHelper.IsValidImageFileExtension(Path.GetExtension(t)));
+            var inputInformation = GetInputInformation(inputFolder);
 
-            var filesInInputCount = 0;
-            var foundExtensions = new HashSet<string>();
-
-            foreach (var foundFile in filesInDirectoryEnumerable)
-            {
-                filesInInputCount++;
-
-                var extension = Path.GetExtension(foundFile);
-                foundExtensions.Add(extension);
-            }
-
-            _logger.Write($"Found {filesInInputCount} files in {inputFolder}");
-
-            if (foundExtensions.Count != 1)
-            {
-                var exceptionString = $"Did not find exactly 1 file extension. Found '{foundExtensions.Count}' extensions instead. Extensions: {string.Join(",", foundExtensions)}.";
-                _logger.WriteError(exceptionString, LogLevel.Exception);
-                throw new InvalidOperationException(exceptionString);
-            }
-
-            var foundExtension = foundExtensions.Single();
-
-            _logger.Write($"Found extension: '{foundExtension}'");
-
-            var firstImageFileName = $"0_0{foundExtension}";
+            var firstImageFileName = $"0_0{inputInformation.FoundExtension}";
             var firstImagePath = Path.Combine(inputFolder, firstImageFileName);
             var firstImage = _imageReader.ReadImage(firstImagePath);
 
-            int filesInWidthAndHeight = (int)Math.Sqrt(filesInInputCount);
+            int filesInWidthAndHeight = (int)Math.Sqrt(inputInformation.AmountOfFiles);
             int sizeInWidthAndHeight = filesInWidthAndHeight * firstImage.Width;
 
             int deepestFolderNumber = (int)Math.Log(sizeInWidthAndHeight, 2);
@@ -65,7 +41,7 @@ namespace Devedse.DeveImagePyramid
             Directory.CreateDirectory(outputForThis);
             var fileConversionAction = new Action<int, int>((x, y) =>
             {
-                var justFileName = $"{x}_{y}{foundExtension}";
+                var justFileName = $"{x}_{y}{inputInformation.FoundExtension}";
                 var filePath = Path.Combine(inputFolder, justFileName);
 
                 var readImage = _imageReader.ReadImage(filePath);
@@ -80,17 +56,18 @@ namespace Devedse.DeveImagePyramid
 
             _logger.Write("Starting conversion/copy of images...", color: ConsoleColor.Yellow);
 
-            var expectedFilesInOutput = filesInInputCount;
+            var expectedFilesInOutput = inputInformation.AmountOfFiles;
             var filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
             var filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
 
             if (useParallel)
             {
-
-                for (int y = 0; y < filesInHeight; y++)
+                //In some quick tests it seemed to be faster to do the parallel loop on the y then on the x.
+                //Either way the inner loop should be parallelized, not the outer loop. This is to work around strange threading errors.
+                for (int x = 0; x < filesInWidth; x++)
                 {
-                    int localY = y;
-                    Parallel.For(0, filesInWidth, (x) => fileConversionAction(x, localY));
+                    int localX = x;
+                    Parallel.For(0, filesInHeight, (y) => fileConversionAction(localX, y));
                 }
             }
             else
@@ -113,38 +90,7 @@ namespace Devedse.DeveImagePyramid
         {
             _logger.Write("Counting all files from input directory...");
 
-            var allFilesInInputEnumerable = Directory.EnumerateFiles(inputFolder).Where(t => FileExtensionHelper.IsValidImageFileExtension(Path.GetExtension(t)));
-
-            var filesInInputCount = 0;
-            var foundExtensions = new HashSet<string>();
-
-            foreach (var foundFile in allFilesInInputEnumerable)
-            {
-                filesInInputCount++;
-
-                var extension = Path.GetExtension(foundFile);
-                foundExtensions.Add(extension);
-            }
-
-            _logger.Write($"Found {filesInInputCount} files in {inputFolder}");
-
-            if (foundExtensions.Count != 1)
-            {
-                var exceptionString = $"Did not find exactly 1 file extension. Found '{foundExtensions.Count}' extensions instead. Extensions: {string.Join(",", foundExtensions)}.";
-                _logger.WriteError(exceptionString, LogLevel.Exception);
-                throw new InvalidOperationException(exceptionString);
-            }
-
-            var foundExtension = foundExtensions.Single();
-
-            _logger.Write($"Found extension: '{foundExtension}'");
-
-            if (!MathHelper.IsPowerOfTwo(filesInInputCount))
-            {
-                var exceptionString = "Amount of files in input directory is not a power of 2";
-                _logger.WriteError(exceptionString, LogLevel.Exception);
-                throw new InvalidOperationException(exceptionString);
-            }
+            var inputInformation = GetInputInformation(inputFolder);
 
             _logger.Write($"Creating output directory: '{outputFolder}'");
             Directory.CreateDirectory(outputFolder);
@@ -153,16 +99,16 @@ namespace Devedse.DeveImagePyramid
 
             _logger.Write("Starting scaling of images...", color: ConsoleColor.Yellow);
 
-            if (filesInInputCount == 1)
+            if (inputInformation.AmountOfFiles == 1)
             {
-                var inputFileName = $"0_0{foundExtension}";
+                var inputFileName = $"0_0{inputInformation.FoundExtension}";
                 var inputTotalPath = Path.Combine(inputFolder, inputFileName);
                 var singleImage = _imageReader.ReadImage(inputTotalPath);
 
                 var combinedImage = new PretzelImageCombined(singleImage);
                 var scaledCombinedImage = ImageZoomOuter.ScaleV2(combinedImage);
 
-                var outputFileName = $"0_0{foundExtension}";
+                var outputFileName = $"0_0{inputInformation.FoundExtension}";
                 var outputTotalPath = Path.Combine(outputFolder, outputFileName);
 
                 _logger.Write($"Writing scaled: {Path.Combine(folderName, outputFileName)}", LogLevel.Verbose);
@@ -170,7 +116,7 @@ namespace Devedse.DeveImagePyramid
             }
             else
             {
-                var expectedFilesInOutput = filesInInputCount / 4;
+                var expectedFilesInOutput = inputInformation.AmountOfFiles / 4;
                 //var filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
                 var filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
 
@@ -179,10 +125,10 @@ namespace Devedse.DeveImagePyramid
                     int xStart = (i % filesInHeight) * 2;
                     int yStart = (i / filesInHeight) * 2;
 
-                    var topLeftFileName = $"{xStart}_{yStart}{foundExtension}";
-                    var bottomLeftFileName = $"{xStart}_{yStart + 1}{foundExtension}";
-                    var topRightFileName = $"{xStart + 1}_{yStart}{foundExtension}";
-                    var bottomRightFileName = $"{xStart + 1}_{yStart + 1}{foundExtension}";
+                    var topLeftFileName = $"{xStart}_{yStart}{inputInformation.FoundExtension}";
+                    var bottomLeftFileName = $"{xStart}_{yStart + 1}{inputInformation.FoundExtension}";
+                    var topRightFileName = $"{xStart + 1}_{yStart}{inputInformation.FoundExtension}";
+                    var bottomRightFileName = $"{xStart + 1}_{yStart + 1}{inputInformation.FoundExtension}";
 
                     var topLeftTotalPath = Path.Combine(inputFolder, topLeftFileName);
                     var bottomLeftTotalPath = Path.Combine(inputFolder, bottomLeftFileName);
@@ -218,6 +164,44 @@ namespace Devedse.DeveImagePyramid
             }
 
             _logger.Write("Completed scaling of images.", color: ConsoleColor.Green);
+        }
+
+        private InputInformation GetInputInformation(string inputFolder)
+        {
+            var filesInDirectoryEnumerable = Directory.EnumerateFiles(inputFolder).Where(t => FileExtensionHelper.IsValidImageFileExtension(Path.GetExtension(t)));
+
+            var filesInInputCount = 0;
+            var foundExtensions = new HashSet<string>();
+
+            foreach (var foundFile in filesInDirectoryEnumerable)
+            {
+                filesInInputCount++;
+
+                var extension = Path.GetExtension(foundFile);
+                foundExtensions.Add(extension);
+            }
+
+            _logger.Write($"Found {filesInInputCount} files in {inputFolder}");
+
+            if (foundExtensions.Count != 1)
+            {
+                var exceptionString = $"Did not find exactly 1 file extension. Found '{foundExtensions.Count}' extensions instead. Extensions: {string.Join(",", foundExtensions)}.";
+                _logger.WriteError(exceptionString, LogLevel.Exception);
+                throw new InvalidOperationException(exceptionString);
+            }
+
+            var foundExtension = foundExtensions.Single();
+
+            _logger.Write($"Found extension: '{foundExtension}'");
+
+            if (!MathHelper.IsPowerOfTwo(filesInInputCount))
+            {
+                var exceptionString = "Amount of files in input directory is not a power of 2";
+                _logger.WriteError(exceptionString, LogLevel.Exception);
+                throw new InvalidOperationException(exceptionString);
+            }
+
+            return new InputInformation { AmountOfFiles = filesInInputCount, FoundExtension = foundExtension };
         }
     }
 }

@@ -106,7 +106,7 @@ namespace Devedse.DeveImagePyramid
 
         private void WriteImagePng(string path, PretzelImage pretzelImage)
         {
-            _logger.Write($"{System.Threading.Thread.CurrentThread.ManagedThreadId} - Writing image Png: {path}, PretzelImage.Width: {pretzelImage.Width} PretzelImage.Height: {pretzelImage.Height} PretzelImage.Data.Length: {pretzelImage.Data.Length}", LogLevel.Verbose);
+            //_logger.Write($"{System.Threading.Thread.CurrentThread.ManagedThreadId} - Writing image Png: {path}, PretzelImage.Width: {pretzelImage.Width} PretzelImage.Height: {pretzelImage.Height} PretzelImage.Data.Length: {pretzelImage.Data.Length}", LogLevel.Verbose);
 
             using (var image = new Bitmap(pretzelImage.Width, pretzelImage.Height, PixelFormat.Format24bppRgb))
             {

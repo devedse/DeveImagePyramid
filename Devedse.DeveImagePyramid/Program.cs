@@ -29,6 +29,8 @@ namespace Devedse.DeveImagePyramid
         {
             using (var logger = CreateLogger(useDifferentFileNamesForLogs))
             {
+                var w = Stopwatch.StartNew();
+
                 var retryHandler = new RetryHandler(logger);
                 var imageReader = new ImageReader(logger);
                 var imageWriter = new ImageWriter(retryHandler, logger);
@@ -36,11 +38,14 @@ namespace Devedse.DeveImagePyramid
 
 
                 logger.Write($"Starting generation of lowest level folder (+ conversion to {desiredExtension})", color: ConsoleColor.Yellow);
+                var wMoveInput = Stopwatch.StartNew();
                 int deepestFolderNumber = pyramidCreator.MoveInputToOutputAndConvert(inputFolder, outputFolder, desiredExtension, useParallel);
+                wMoveInput.Stop();
                 logger.Write("Done with generation of lowest level.", color: ConsoleColor.Green);
                 logger.EmptyLine();
 
                 logger.Write("Starting the scaling process...");
+                var wPyramid = Stopwatch.StartNew();
                 for (int i = deepestFolderNumber - 1; i >= 1; i--)
                 {
                     var destFolder = Path.Combine(outputFolder, i.ToString());
@@ -51,7 +56,12 @@ namespace Devedse.DeveImagePyramid
                     logger.Write($"Done with scale {i}", color: ConsoleColor.Green);
                     logger.EmptyLine();
                 }
+                wPyramid.Stop();
 
+                logger.Write("Time taken for moving and converting input: " + wMoveInput.Elapsed);
+                logger.Write("Time taken for creating pyramid: " + wPyramid.Elapsed);
+                logger.Write("Total time taken: " + w.Elapsed);
+                logger.EmptyLine();
                 logger.Write("Completed, press any key to continue...");
                 Console.ReadKey();
             }
