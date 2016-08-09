@@ -63,33 +63,44 @@ namespace Devedse.DeveImagePyramid
             var outputForThis = Path.Combine(outputFolder, deepestFolderNumber.ToString());
             _logger.Write($"Creating output directory: '{outputForThis}'");
             Directory.CreateDirectory(outputForThis);
-            var fileConversionAction = new Action<string>(filePath =>
+            var fileConversionAction = new Action<int, int>((x, y) =>
             {
-                var extension = Path.GetExtension(filePath);
-                if (FileExtensionHelper.IsValidImageFileExtension(extension))
-                {
-                    var readImage = _imageReader.ReadImage(filePath);
+                var justFileName = $"{x}_{y}{foundExtension}";
+                var filePath = Path.Combine(inputFolder, justFileName);
 
-                    var outputFileName = Path.GetFileNameWithoutExtension(filePath);
-                    var outputFileNameWithExtension = outputFileName + desiredExtension;
-                    var totalOutputPath = Path.Combine(outputForThis, outputFileNameWithExtension);
+                var readImage = _imageReader.ReadImage(filePath);
 
-                    _logger.Write($"Writing: {outputFileNameWithExtension}", LogLevel.Verbose);
-                    _imageWriter.WriteImage(totalOutputPath, readImage);
-                }
+                var outputFileName = Path.GetFileNameWithoutExtension(filePath);
+                var outputFileNameWithExtension = outputFileName + desiredExtension;
+                var totalOutputPath = Path.Combine(outputForThis, outputFileNameWithExtension);
+
+                _logger.Write($"Writing: {outputFileNameWithExtension}", LogLevel.Verbose);
+                _imageWriter.WriteImage(totalOutputPath, readImage);
             });
 
             _logger.Write("Starting conversion/copy of images...", color: ConsoleColor.Yellow);
 
+            var expectedFilesInOutput = filesInInputCount;
+            var filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
+            var filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
+
             if (useParallel)
             {
-                Parallel.ForEach(filesInDirectoryEnumerable, fileConversionAction);
+
+                for (int y = 0; y < filesInHeight; y++)
+                {
+                    int localY = y;
+                    Parallel.For(0, filesInWidth, (x) => fileConversionAction(x, localY));
+                }
             }
             else
             {
-                foreach (var filePath in filesInDirectoryEnumerable)
+                for (int y = 0; y < filesInHeight; y++)
                 {
-                    fileConversionAction(filePath);
+                    for (int x = 0; x < filesInWidth; x++)
+                    {
+                        fileConversionAction(x, y);
+                    }
                 }
             }
 

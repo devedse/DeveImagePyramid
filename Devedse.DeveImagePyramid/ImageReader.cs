@@ -96,18 +96,18 @@ namespace Devedse.DeveImagePyramid
                 Marshal.Copy(lockedBits.Scan0, bytes, 0, bytes.Length);
 
                 var index = 0;
+                var startPos = 0;
 
                 for (var y = 0; y < lockedBits.Height; y++)
                 {
                     for (var x = 0; x < lockedBits.Width; x++)
                     {
-                        int startPos = y * image.Width * 3 + x * 3;
-
                         data[startPos + 0] = bytes[index + 2];
                         data[startPos + 1] = bytes[index + 1];
                         data[startPos + 2] = bytes[index + 0];
 
                         index += pixelSize;
+                        startPos += pixelSize;
                     }
 
                     index += padding;

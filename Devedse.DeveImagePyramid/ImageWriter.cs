@@ -106,7 +106,7 @@ namespace Devedse.DeveImagePyramid
 
         private void WriteImagePng(string path, PretzelImage pretzelImage)
         {
-            _logger.Write($"Writing image Png: {path}, PretzelImage.Width: {pretzelImage.Width} PretzelImage.Height: {pretzelImage.Height} PretzelImage.Data.Length: {pretzelImage.Data.Length}", LogLevel.Verbose);
+            _logger.Write($"{System.Threading.Thread.CurrentThread.ManagedThreadId} - Writing image Png: {path}, PretzelImage.Width: {pretzelImage.Width} PretzelImage.Height: {pretzelImage.Height} PretzelImage.Data.Length: {pretzelImage.Data.Length}", LogLevel.Verbose);
 
             using (var image = new Bitmap(pretzelImage.Width, pretzelImage.Height, PixelFormat.Format24bppRgb))
             {
@@ -118,17 +118,18 @@ namespace Devedse.DeveImagePyramid
                 var padding = lockedBits.Stride - (lockedBits.Width * pixelSize);
 
                 var index = 0;
+                var startPos = 0;
+
                 for (int y = 0; y < pretzelImage.Height; y++)
                 {
                     for (int x = 0; x < pretzelImage.Width; x++)
                     {
-                        int startPos = y * image.Width * 3 + x * 3;
-
                         outputBytes[index + 2] = pretzelImage.Data[startPos + 0];
                         outputBytes[index + 1] = pretzelImage.Data[startPos + 1];
                         outputBytes[index + 0] = pretzelImage.Data[startPos + 2];
 
                         index += pixelSize;
+                        startPos += pixelSize;
                     }
 
                     index += padding;
