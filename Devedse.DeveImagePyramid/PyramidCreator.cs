@@ -117,13 +117,13 @@ namespace Devedse.DeveImagePyramid
             else
             {
                 var expectedFilesInOutput = inputInformation.AmountOfFiles / 4;
-                //var filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
+                var filesInWidth = (int)Math.Sqrt(expectedFilesInOutput);
                 var filesInHeight = (int)Math.Sqrt(expectedFilesInOutput);
 
-                var scaleAction = new Action<int>(i =>
+                var scaleAction = new Action<int, int>((x, y) =>
                 {
-                    int xStart = (i % filesInHeight) * 2;
-                    int yStart = (i / filesInHeight) * 2;
+                    int xStart = x * 2;
+                    int yStart = y * 2;
 
                     var topLeftFileName = $"{xStart}_{yStart}{inputInformation.FoundExtension}";
                     var bottomLeftFileName = $"{xStart}_{yStart + 1}{inputInformation.FoundExtension}";
@@ -152,13 +152,22 @@ namespace Devedse.DeveImagePyramid
 
                 if (useParallel)
                 {
-                    Parallel.For(0, expectedFilesInOutput, scaleAction);
+                    //In some quick tests it seemed to be faster to do the parallel loop on the y then on the x.
+                    //Either way the inner loop should be parallelized, not the outer loop. This is to work around strange threading errors.
+                    for (int x = 0; x < filesInWidth; x++)
+                    {
+                        int localX = x;
+                        Parallel.For(0, filesInHeight, (y) => scaleAction(localX, y));
+                    }
                 }
                 else
                 {
-                    for (int i = 0; i < expectedFilesInOutput; i++)
+                    for (int y = 0; y < filesInHeight; y++)
                     {
-                        scaleAction(i);
+                        for (int x = 0; x < filesInWidth; x++)
+                        {
+                            scaleAction(x, y);
+                        }
                     }
                 }
             }
