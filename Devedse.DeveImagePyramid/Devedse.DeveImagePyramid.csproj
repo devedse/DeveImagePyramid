@@ -53,8 +53,8 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BitMiracle.LibTiff.NET, Version=2.4.542.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
-      <HintPath>..\packages\BitMiracle.LibTiff.NET.2.4.542\lib\net20\BitMiracle.LibTiff.NET.dll</HintPath>
+    <Reference Include="BitMiracle.LibTiff.NET, Version=2.4.560.0, Culture=neutral, PublicKeyToken=53879b3e20e7a7d6, processorArchitecture=MSIL">
+      <HintPath>..\packages\BitMiracle.LibTiff.NET.2.4.560\lib\net20\BitMiracle.LibTiff.NET.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
