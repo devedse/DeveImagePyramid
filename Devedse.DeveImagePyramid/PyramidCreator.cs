@@ -13,12 +13,17 @@ namespace Devedse.DeveImagePyramid
         private readonly ILogger _logger;
         private readonly ImageWriter _imageWriter;
         private readonly ImageReader _imageReader;
+        private readonly ParallelOptions _parallelOptions;
 
         public PyramidCreator(ImageWriter imageWriter, ImageReader imageReader, ILogger logger)
         {
             _imageWriter = imageWriter;
             _imageReader = imageReader;
             _logger = logger;
+            _parallelOptions = new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount * 2
+            };
         }
 
         public int MoveInputToOutputAndConvert(string inputFolder, string outputFolder, string desiredExtension, bool useParallel)
@@ -67,7 +72,7 @@ namespace Devedse.DeveImagePyramid
                 for (int x = 0; x < filesInWidth; x++)
                 {
                     int localX = x;
-                    Parallel.For(0, filesInHeight, (y) => fileConversionAction(localX, y));
+                    Parallel.For(0, filesInHeight, _parallelOptions, (y) => fileConversionAction(localX, y));
                 }
             }
             else
@@ -157,7 +162,7 @@ namespace Devedse.DeveImagePyramid
                     for (int x = 0; x < filesInWidth; x++)
                     {
                         int localX = x;
-                        Parallel.For(0, filesInHeight, (y) => scaleAction(localX, y));
+                        Parallel.For(0, filesInHeight, _parallelOptions, (y) => scaleAction(localX, y));
                     }
                 }
                 else
