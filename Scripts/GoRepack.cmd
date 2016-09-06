@@ -1,1 +1,1 @@
-"%~dp0..\packages\ILRepack.2.0.10\tools\ILRepack.exe" /out:"%~dp0Output\DeveImagePyramid.exe" "%~dp0..\Devedse.DeveImagePyramid\bin\Release\Devedse.DeveImagePyramid.exe" "%~dp0..\Devedse.DeveImagePyramid\bin\Release\BitMiracle.LibTiff.NET.dll"
+"%~dp0..\packages\ILRepack.2.0.11\tools\ILRepack.exe" /out:"%~dp0Output\DeveImagePyramid.exe" "%~dp0..\Devedse.DeveImagePyramid\bin\Release\Devedse.DeveImagePyramid.exe" "%~dp0..\Devedse.DeveImagePyramid\bin\Release\BitMiracle.LibTiff.NET.dll"
